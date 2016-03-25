@@ -32,7 +32,7 @@ class Sportability(object):
 
     def crawl_schedule(self):
         response = requests.get(self._url)
-        soup = BeautifulSoup(response.text)
+        soup = BeautifulSoup(response.text, 'html.parser')
 
         # Parse the schedule table.
         # Get all the rows.
