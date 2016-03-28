@@ -11,6 +11,8 @@ class BenchApp(object):
         self._login_url = 'https://www.benchapp.com/player-area/ajax/login.php'
         self._schedule_url = 'https://www.benchapp.com/schedule/list'
         self._add_game_url = 'https://www.benchapp.com/schedule-area/ajax/addEditGame.php'
+        self._remove_game_url = 'https://www.benchapp.com/modules/ajax/removeItem.php'
+
         self._team_name = team_name
         self._games = []
 
@@ -20,7 +22,7 @@ class BenchApp(object):
                            data={'email': email, 'password': password})
 
     def _parse_game(self, date_string, time_string, home_team, away_team,
-                    location_string):
+                    location_string, game_id_string):
         # Parse date and time into a datetime.
         date = parsedate(date_string).date()
         time = parsedate(time_string).time()
@@ -34,7 +36,11 @@ class BenchApp(object):
             opponent = home_team
             is_home = False
 
-        return Game(game_time, opponent, is_home, location_string)
+        return Game(game_time,
+                    opponent,
+                    is_home,
+                    location_string,
+                    game_id_string)
 
     def crawl_schedule(self):
         response = self._session.get(self._schedule_url)
@@ -57,13 +63,15 @@ class BenchApp(object):
             location_string = text_filter_re.search(\
                 columns_soup[3].find('div', {'class': 'location'}).getText()).group()
             time_string = columns_soup[4].getText()
+            game_id_string = columns_soup[0]['href'].split('-')[1]
 
             # Parse the game.
             game = self._parse_game(date_string,
                                     time_string,
                                     home_team,
                                     away_team,
-                                    location_string)
+                                    location_string,
+                                    game_id_string)
             if game.time.date() > datetime.date.today():
                 # Only look at future games.
                 self._games.append(game)
@@ -86,6 +94,20 @@ class BenchApp(object):
                                              'min': game.time.strftime('%M'),
                                              'am-pm': game.time.strftime('%p'),
                                              'location': game.location
+                                          })
+            response.raise_for_status()
+
+    def remove_games(self, games):
+        """ Remove games from the benchapp schedule.
+
+            TODO(kevin): We should probably "cancel" rather than "remove" the
+            game so the team gets notified.
+        """
+        for game in games:
+            response = self._session.get(self._remove_game_url,
+                                         params={
+                                             'type': 'game',
+                                             'id': game.game_id
                                           })
             response.raise_for_status()
 
