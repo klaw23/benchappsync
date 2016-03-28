@@ -57,11 +57,15 @@ class BenchApp(object):
                 columns_soup[3].find('div', {'class': 'location'}).getText()).group()
             time_string = columns_soup[4].getText()
 
-            self._games.append(self._parse_game(date_string,
-                                                time_string,
-                                                home_team,
-                                                away_team,
-                                                location_string))
+            # Parse the game.
+            game = self._parse_game(date_string,
+                                    time_string,
+                                    home_team,
+                                    away_team,
+                                    location_string)
+            if game.time.date() > datetime.date.today():
+                # Only look at future games.
+                self._games.append(game)
 
     @property
     def games(self):

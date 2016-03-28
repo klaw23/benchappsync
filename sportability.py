@@ -47,10 +47,14 @@ class Sportability(object):
             # TODO(kevin): I think the score goes in column 3.
             location_string = columns_soup[4].getText()
 
-            self._games.append(self._parse_game(date_string,
-                                                time_string,
-                                                matchup_string,
-                                                location_string))
+            # Parse the game.
+            game = self._parse_game(date_string,
+                                    time_string,
+                                    matchup_string,
+                                    location_string)
+            if game.time.date() > datetime.date.today():
+                # Only look at future games.
+                self._games.append(game)
 
     @property
     def games(self):
