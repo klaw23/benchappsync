@@ -10,6 +10,7 @@ class BenchApp(object):
     def __init__(self, email, password, team_name):
         self._login_url = 'https://www.benchapp.com/player-area/ajax/login.php'
         self._schedule_url = 'https://www.benchapp.com/schedule/list'
+        self._add_game_url = 'https://www.benchapp.com/schedule-area/ajax/addEditGame.php'
         self._team_name = team_name
         self._games = []
 
@@ -66,6 +67,27 @@ class BenchApp(object):
             if game.time.date() > datetime.date.today():
                 # Only look at future games.
                 self._games.append(game)
+
+    def add_games(self, games):
+        """ Add games to the benchapp schedule.
+        """
+        for game in games:
+            # TODO(kevin): Use Benchapp opponent ID rather than creating a new
+            # opponent for every game.
+            response = self._session.get(self._add_game_url,
+                                         params={
+                                             'type': 'GAME',
+                                             'subType': 'REGULAR',
+                                             'opponentID': 0,
+                                             'newTeamName': game.opponent,
+                                             'homeAway': 'Home' if game.is_home else 'Away',
+                                             'dateValue': str(game.time.date()),
+                                             'hr': game.time.strftime('%I'),
+                                             'min': game.time.strftime('%M'),
+                                             'am-pm': game.time.strftime('%p'),
+                                             'location': game.location
+                                          })
+            response.raise_for_status()
 
     @property
     def games(self):
