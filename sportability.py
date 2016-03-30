@@ -40,12 +40,14 @@ class Sportability(object):
         for row_soup in rows_soup:
             # Parse the columns from each row.
             columns_soup = row_soup.findAll('td')
-
-            date_string = columns_soup[0].getText()
-            time_string = columns_soup[1].getText()
-            matchup_string = columns_soup[2].getText()
-            # TODO(kevin): I think the score goes in column 3.
-            location_string = columns_soup[4].getText()
+            
+            try:
+                date_string = columns_soup[0].getText()
+                time_string = columns_soup[1].getText()
+                matchup_string = columns_soup[2].getText()
+                location_string = columns_soup[4].getText()
+            except IndexError:
+                continue
 
             # Parse the game.
             game = self._parse_game(date_string,
