@@ -29,6 +29,10 @@ def main():
                         help='Mailgun domain')
     parser.add_argument('-k', '--mg_key',
                         help='Mailgun secret key')
+    parser.add_argument('-r', '--dry_run',
+                        action='store_true',
+                        default=False,
+                        help='Dry run')
     args = parser.parse_args()
 
     print 'Crawling Schedules...'
@@ -47,6 +51,10 @@ def main():
     added_games, removed_games = Game.diff(benchapp.games, sportability.games)
     print 'Adding %d games, Removing %d games...' % (len(added_games),
                                                      len(removed_games))
+
+    # Quit if dry run.
+    if args.dry_run:
+        return
 
     # E-mail updates.
     if (len(added_games) or len(removed_games)) and args.mg_domain and args.mg_key:
