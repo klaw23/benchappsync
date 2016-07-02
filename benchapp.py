@@ -59,10 +59,10 @@ class BenchApp(object):
             text_filter_re = re.compile('[A-Za-z ]+')
             home_team = text_filter_re.search(columns_soup[1].getText()).group()
             away_team = text_filter_re.search(columns_soup[2].getText()).group()
-            date_string = columns_soup[3].find('div', {'class': 'date'}).getText()
+            date_string = row_soup.find('div', {'class': 'dayOfMonth'}).getText()
             location_string = text_filter_re.search(\
                 columns_soup[3].find('div', {'class': 'location'}).getText()).group()
-            time_string = columns_soup[4].getText()
+            time_string = row_soup.find('div', {'class': 'time'}).getText()
             game_id_string = columns_soup[0]['href'].split('-')[1]
 
             # Parse the game.
