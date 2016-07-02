@@ -93,6 +93,7 @@ class BenchApp(object):
                                              'hr': game.time.strftime('%I'),
                                              'min': game.time.strftime('%M'),
                                              'am-pm': game.time.strftime('%p'),
+                                             'duration_hrs': "1",
                                              'location': game.location
                                           })
             response.raise_for_status()
