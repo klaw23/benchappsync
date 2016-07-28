@@ -20,6 +20,9 @@ class Sportability(object):
         game_time = datetime.datetime.combine(date, time)
 
         # Parse matchup.
+        # Playoffs start with "(Pla)", so have to pull that off the front.
+        if matchup_string.startswith('(Pla) '):
+            matchup_string = matchup_string[6:]
         teams = matchup_string.split(' at ')
         if teams[0] == self._team_name:
             opponent = teams[1]
