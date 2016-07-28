@@ -23,6 +23,9 @@ class Sportability(object):
         # Playoffs start with "(Pla)", so have to pull that off the front.
         if matchup_string.startswith('(Pla) '):
             matchup_string = matchup_string[6:]
+            playoffs = True
+        else:
+            playoffs = False
         teams = matchup_string.split(' at ')
         if teams[0] == self._team_name:
             opponent = teams[1]
@@ -31,7 +34,7 @@ class Sportability(object):
             opponent = teams[0]
             is_home = True
 
-        return Game(game_time, opponent, is_home, location_string)
+        return Game(game_time, opponent, is_home, location_string, playoffs=playoffs)
 
     def crawl_schedule(self):
         response = requests.get(self._url)

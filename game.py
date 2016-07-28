@@ -25,12 +25,13 @@ class Game(object):
                 removed_games.append(game)
         return (added_games, removed_games)
 
-    def __init__(self, time, opponent, is_home, location, game_id=None):
+    def __init__(self, time, opponent, is_home, location, game_id=None, playoffs=False):
         self._time = time
         self._opponent = opponent
         self._is_home = is_home
         self._location = location
         self._game_id = game_id
+        self._playoffs = playoffs
 
     @property
     def time(self):
@@ -52,6 +53,9 @@ class Game(object):
     def game_id(self):
         return self._game_id
 
+    @property
+    def playoffs(self):
+        return self._playoffs
 
     def __repr__(self):
         return '%s %s %s %s %s' % (str(self._time),
@@ -63,4 +67,4 @@ class Game(object):
     def __eq__(self, other):
         # Don't worry about location.
         return (self.time == other.time and self.opponent == other.opponent and
-                self.is_home == other.is_home)
+                self.is_home == other.is_home and self.playoffs == other.playoffs)

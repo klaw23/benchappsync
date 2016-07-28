@@ -22,7 +22,7 @@ class BenchApp(object):
                            data={'email': email, 'password': password})
 
     def _parse_game(self, date_string, time_string, home_team, away_team,
-                    location_string, game_id_string):
+                    location_string, game_id_string, playoffs):
         # Parse date and time into a datetime.
         date = parsedate(date_string).date()
         time = parsedate(time_string).time()
@@ -40,7 +40,8 @@ class BenchApp(object):
                     opponent,
                     is_home,
                     location_string,
-                    game_id_string)
+                    game_id_string,
+                    playoffs)
 
     def crawl_schedule(self):
         response = self._session.get(self._schedule_url)
@@ -64,6 +65,7 @@ class BenchApp(object):
                 columns_soup[3].find('div', {'class': 'location'}).getText()).group()
             time_string = row_soup.find('div', {'class': 'time'}).getText()
             game_id_string = columns_soup[0]['href'].split('-')[1]
+            playoffs = bool(row_soup.find('span', {'class': 'fa-trophy'}))
 
             # Parse the game.
             game = self._parse_game(date_string,
@@ -71,7 +73,8 @@ class BenchApp(object):
                                     home_team,
                                     away_team,
                                     location_string,
-                                    game_id_string)
+                                    game_id_string,
+                                    playoffs)
             if game.time.date() > datetime.date.today():
                 # Only look at future games.
                 self._games.append(game)
@@ -85,7 +88,7 @@ class BenchApp(object):
             response = self._session.get(self._add_game_url,
                                          params={
                                              'type': 'GAME',
-                                             'subType': 'REGULAR',
+                                             'subType': 'PLAYOFF' if game.playoffs else 'REGULAR',
                                              'opponentID': 0,
                                              'newTeamName': game.opponent,
                                              'homeAway': 'Home' if game.is_home else 'Away',
