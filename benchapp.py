@@ -22,11 +22,14 @@ class BenchApp(object):
                            data={'email': email, 'password': password})
 
     def _parse_game(self, date_string, time_string, home_team, away_team,
-                    location_string, game_id_string, playoffs):
+                    location_string, game_id_string, playoffs, last_game):
         # Parse date and time into a datetime.
         date = parsedate(date_string).date()
         time = parsedate(time_string).time()
         game_time = datetime.datetime.combine(date, time)
+        # Infer the year by assuming this game must be after the last game.
+        if last_game and game_time < last_game.time:
+            game_time = game_time.replace(year=game_time.year + 1)
 
         # Parse matchup.
         if home_team == self._team_name:
@@ -51,6 +54,7 @@ class BenchApp(object):
         # Get all rows with a month-year class (example: Mar-2016).
         row_class_re = re.compile('^\w\w\w-\w\w\w\w')
         rows_soup = soup.findAll('tr', {'class': row_class_re})
+        game = None
         for row_soup in rows_soup:
             # Parse the columns from each row.
             # Filter for links to the game.
@@ -74,7 +78,8 @@ class BenchApp(object):
                                     away_team,
                                     location_string,
                                     game_id_string,
-                                    playoffs)
+                                    playoffs,
+                                    game)
             if game.time.date() > datetime.date.today():
                 # Only look at future games.
                 self._games.append(game)
