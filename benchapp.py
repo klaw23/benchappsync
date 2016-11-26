@@ -90,8 +90,8 @@ class BenchApp(object):
         for game in games:
             # TODO(kevin): Use Benchapp opponent ID rather than creating a new
             # opponent for every game.
-            response = self._session.get(self._add_game_url,
-                                         params={
+            response = self._session.post(self._add_game_url,
+                                          data={
                                              'type': 'GAME',
                                              'subType': 'PLAYOFF' if game.playoffs else 'REGULAR',
                                              'opponentID': 0,
