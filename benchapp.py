@@ -27,9 +27,17 @@ class BenchApp(object):
         date = parsedate(date_string).date()
         time = parsedate(time_string).time()
         game_time = datetime.datetime.combine(date, time)
-        # Infer the year by assuming this game must be after the last game.
-        if last_game and game_time < last_game.time:
-            game_time = game_time.replace(year=game_time.year + 1)
+
+        # Infer the year by assuming this game must be after the last game
+        # and the first game should be within the next 3 months.
+        year = last_game.time.year if last_game else datetime.date.today().year
+        game_time = game_time.replace(year=year)
+        if last_game:
+            if game_time < last_game.time:
+                game_time = game_time.replace(year=year + 1)
+        else:
+            if game_time > datetime.datetime.now() + datetime.timedelta(days=90):
+                game_time = game_time.replace(year=year - 1)
 
         # Parse matchup.
         if home_team == self._team_name:
