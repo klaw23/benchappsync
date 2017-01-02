@@ -47,6 +47,9 @@ def main():
     benchapp = BenchApp(args.ba_email, args.ba_password, args.teamname)
     benchapp.crawl_schedule()
 
+    # Debugging
+    # print 'sportability: ' + str(sportability.games) + '\nbenchapp' + str(benchapp.games)
+
     # Find games to add to and remove from Benchapp.
     added_games, removed_games = Game.diff(benchapp.games, sportability.games)
     print 'Adding %d games, Removing %d games...' % (len(added_games),
